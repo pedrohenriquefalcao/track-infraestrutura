@@ -1,0 +1,139 @@
+<div class="aplicacao">
+  <aside class="barra-lateral">
+    <a class="marca" href="#" aria-label="Track Cloud">
+      <span class="marca-simbolo">TC</span>
+      <span>Track<br><strong>Cloud</strong></span>
+    </a>
+
+    <nav class="navegacao" aria-label="Navegação principal">
+      <button class="item-nav ativo" type="button" aria-current="page">
+        <span class="icone-nav">◫</span> Visão geral
+      </button>
+      <button class="item-nav" type="button">
+        <span class="icone-nav">⌁</span> Recursos
+      </button>
+      <button class="item-nav" type="button">
+        <span class="icone-nav">R$</span> Custos
+      </button>
+      <button class="item-nav" type="button">
+        <span class="icone-nav">△</span> Alertas
+        <span class="contador-alerta">{{ recursosEmAlerta() }}</span>
+      </button>
+    </nav>
+
+    <div class="perfil">
+      <div class="avatar">PP</div>
+      <div><strong>Pedro Pereira</strong><small>Administrador</small></div>
+      <button type="button" aria-label="Mais opções">⋯</button>
+    </div>
+  </aside>
+
+  <main class="conteudo">
+    <header class="cabecalho">
+      <div>
+        <p class="saudacao">Painel operacional</p>
+        <h1>Visão geral</h1>
+      </div>
+      <div class="acoes-cabecalho">
+        <label class="busca">
+          <span aria-hidden="true">⌕</span>
+          <input type="search" placeholder="Buscar recurso" [value]="termoBusca()" (input)="alterarBusca($event)">
+        </label>
+        <button class="botao-novo" type="button" (click)="abrirNovoRecurso()">+ Novo recurso</button>
+      </div>
+    </header>
+
+    <section class="grade-indicadores" aria-label="Indicadores principais">
+      <article class="indicador indicador-destaque">
+        <div class="rotulo-indicador"><span>Custo mensal</span><span class="bolha">●</span></div>
+        <strong>{{ custoTotal() | currency:'BRL':'symbol':'1.2-2' }}</strong>
+        <small><b>↓ 8,4%</b> em relação ao mês anterior</small>
+      </article>
+      <article class="indicador">
+        <div class="rotulo-indicador"><span>Recursos ativos</span><span class="status-ponto"></span></div>
+        <strong>{{ recursosAtivos() }}</strong>
+        <small>de {{ recursos().length }} recursos monitorados</small>
+      </article>
+      <article class="indicador">
+        <div class="rotulo-indicador"><span>Maior uso de CPU</span><span class="icone-mini">⌁</span></div>
+        <strong>{{ maiorConsumoCpu().consumoCpu }}%</strong>
+        <small>{{ maiorConsumoCpu().nome }}</small>
+      </article>
+      <article class="indicador">
+        <div class="rotulo-indicador"><span>Alertas ativos</span><span class="bolha alerta">●</span></div>
+        <strong>{{ recursosEmAlerta() }}</strong>
+        <small>necessitam de atenção</small>
+      </article>
+    </section>
+
+    <section class="painel-recursos">
+      <div class="cabecalho-painel">
+        <div>
+          <p class="rotulo-secao">Infraestrutura</p>
+          <h2>Recursos monitorados</h2>
+        </div>
+        <select class="filtro" [value]="ambienteFiltro()" (change)="alterarAmbiente($event)" aria-label="Filtrar por ambiente">
+          <option>Todos</option>
+          <option>Produção</option>
+          <option>Homologação</option>
+          <option>Desenvolvimento</option>
+        </select>
+      </div>
+
+      <div class="tabela">
+        <div class="linha tabela-cabecalho">
+          <span>Recurso</span><span>Ambiente</span><span>Consumo</span><span>Custo/mês</span><span>Estado</span><span></span>
+        </div>
+        <div class="linha" *ngFor="let recurso of recursosFiltrados()">
+          <div class="celula-recurso">
+            <div class="icone-recurso">{{ recurso.tipo === 'Máquina virtual' ? 'VM' : recurso.tipo === 'Banco de dados' ? 'DB' : recurso.tipo === 'Rede' ? 'NW' : 'ST' }}</div>
+            <div><strong>{{ recurso.nome }}</strong><small>{{ recurso.provedor }} · {{ recurso.regiao }}</small></div>
+          </div>
+          <span class="ambiente">{{ recurso.ambiente }}</span>
+          <div class="consumo">
+            <div><span>CPU</span><strong>{{ recurso.consumoCpu }}%</strong></div>
+            <div class="barra"><i [style.width.%]="recurso.consumoCpu"></i></div>
+          </div>
+          <strong class="custo">{{ recurso.custoMensal | currency:'BRL':'symbol':'1.2-2' }}</strong>
+          <span class="estado" [ngClass]="classeEstado(recurso.estado)"><i></i>{{ recurso.estado }}</span>
+          <div class="acoes">
+            <button type="button" (click)="editarRecurso(recurso)" aria-label="Editar {{ recurso.nome }}">✎</button>
+            <button type="button" (click)="excluirRecurso(recurso.id)" aria-label="Excluir {{ recurso.nome }}">×</button>
+          </div>
+        </div>
+        <div class="estado-vazio" *ngIf="!recursosFiltrados().length">
+          Nenhum recurso encontrado. Ajuste a busca ou os filtros.
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="overlay" *ngIf="modalAberto()" (mousedown)="fecharModal()">
+  <section class="modal" role="dialog" aria-modal="true" aria-labelledby="titulo-modal" (mousedown)="$event.stopPropagation()">
+    <div class="cabecalho-modal">
+      <div><p class="rotulo-secao">Cadastro</p><h2 id="titulo-modal">{{ recursoEmEdicao() ? 'Editar recurso' : 'Novo recurso' }}</h2></div>
+      <button type="button" (click)="fecharModal()" aria-label="Fechar">×</button>
+    </div>
+    <form (ngSubmit)="salvarRecurso()">
+      <label>Nome do recurso<input [(ngModel)]="formularioRecurso.nome" name="nome" required placeholder="Ex: api-pagamentos"></label>
+      <div class="linha-formulario">
+        <label>Provedor<select [(ngModel)]="formularioRecurso.provedor" name="provedor"><option>AWS</option><option>Azure</option><option>Google Cloud</option></select></label>
+        <label>Tipo<select [(ngModel)]="formularioRecurso.tipo" name="tipo"><option>Máquina virtual</option><option>Banco de dados</option><option>Armazenamento</option><option>Rede</option></select></label>
+      </div>
+      <div class="linha-formulario">
+        <label>Ambiente<select [(ngModel)]="formularioRecurso.ambiente" name="ambiente"><option>Produção</option><option>Homologação</option><option>Desenvolvimento</option></select></label>
+        <label>Estado<select [(ngModel)]="formularioRecurso.estado" name="estado"><option>Ativo</option><option>Alerta</option><option>Ocioso</option></select></label>
+      </div>
+      <div class="linha-formulario">
+        <label>Custo mensal (R$)<input type="number" min="0" step="0.01" [(ngModel)]="formularioRecurso.custoMensal" name="custo"></label>
+        <label>Região<input [(ngModel)]="formularioRecurso.regiao" name="regiao" placeholder="Ex: São Paulo"></label>
+      </div>
+      <div class="linha-formulario">
+        <label>Consumo de CPU (%)<input type="number" min="0" max="100" [(ngModel)]="formularioRecurso.consumoCpu" name="cpu"></label>
+        <label>Consumo de memória (%)<input type="number" min="0" max="100" [(ngModel)]="formularioRecurso.consumoMemoria" name="memoria"></label>
+      </div>
+      <div class="acoes-modal"><button type="button" class="botao-cancelar" (click)="fecharModal()">Cancelar</button><button type="submit" class="botao-novo">Salvar recurso</button></div>
+    </form>
+  </section>
+</div>
