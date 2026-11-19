@@ -1,45 +1,52 @@
 <div class="aplicacao">
   <aside class="barra-lateral">
-    <a class="marca" href="#" aria-label="Track Cloud">
-      <span class="marca-simbolo">TC</span>
-      <span>Track<br><strong>Cloud</strong></span>
+    <a class="marca" href="#" aria-label="Página inicial da Track Cloud">
+      <span class="marca-simbolo" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M7.5 18.5h9a4.5 4.5 0 0 0 .4-9A6.5 6.5 0 0 0 4.2 12a3.3 3.3 0 0 0 3.3 6.5Z"/><path d="M9.5 14.5h5M12 12v5"/></svg>
+      </span>
+      <span>Track <strong>Cloud</strong></span>
     </a>
 
     <nav class="navegacao" aria-label="Navegação principal">
       <button class="item-nav ativo" type="button" aria-current="page">
-        <span class="icone-nav">◫</span> Visão geral
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Visão geral
       </button>
       <button class="item-nav" type="button">
-        <span class="icone-nav">⌁</span> Recursos
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 9h10M7 13h6"/></svg>
+        Recursos
       </button>
       <button class="item-nav" type="button">
-        <span class="icone-nav">R$</span> Custos
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>
+        Custos
       </button>
       <button class="item-nav" type="button">
-        <span class="icone-nav">△</span> Alertas
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2.8 19h18.4L12 3Z"/><path d="M12 9v4M12 16.5v.5"/></svg>
+        Alertas
         <span class="contador-alerta">{{ recursosEmAlerta() }}</span>
       </button>
     </nav>
 
     <div class="perfil">
-      <div class="avatar">PP</div>
+      <div class="avatar" aria-hidden="true">PP</div>
       <div><strong>Pedro Pereira</strong><small>Administrador</small></div>
-      <button type="button" aria-label="Mais opções">⋯</button>
+      <button type="button" aria-label="Abrir opções do perfil">•••</button>
     </div>
   </aside>
 
   <main class="conteudo">
     <header class="cabecalho">
       <div>
-        <p class="saudacao">Painel operacional</p>
+        <p class="saudacao"><span class="ponto-online"></span> Infraestrutura conectada</p>
         <h1>Visão geral</h1>
       </div>
       <div class="acoes-cabecalho">
         <label class="busca">
-          <span aria-hidden="true">⌕</span>
-          <input type="search" placeholder="Buscar recurso" [value]="termoBusca()" (input)="alterarBusca($event)">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6"/><path d="m16 16 4 4"/></svg>
+          <span class="texto-visivel">Buscar recurso</span>
+          <input type="search" aria-label="Buscar recurso" placeholder="Nome, tipo ou provedor" [value]="termoBusca()" (input)="alterarBusca($event)">
         </label>
-        <button class="botao-novo" type="button" (click)="abrirNovoRecurso()">+ Novo recurso</button>
+        <button class="botao-novo" type="button" (click)="abrirNovoRecurso()">Adicionar recurso</button>
       </div>
     </header>
 
@@ -47,93 +54,104 @@
       <article class="indicador indicador-destaque">
         <div class="rotulo-indicador"><span>Custo mensal</span><span class="bolha">●</span></div>
         <strong>{{ custoTotal() | currency:'BRL':'symbol':'1.2-2' }}</strong>
-        <small><b>↓ 8,4%</b> em relação ao mês anterior</small>
+        <small><b>8,4% abaixo</b> do mês anterior</small>
       </article>
       <article class="indicador">
         <div class="rotulo-indicador"><span>Recursos ativos</span><span class="status-ponto"></span></div>
         <strong>{{ recursosAtivos() }}</strong>
-        <small>de {{ recursos().length }} recursos monitorados</small>
+        <small>de {{ recursos().length }} monitorados</small>
       </article>
       <article class="indicador">
-        <div class="rotulo-indicador"><span>Maior uso de CPU</span><span class="icone-mini">⌁</span></div>
+        <div class="rotulo-indicador"><span>Pico de CPU</span><span class="icone-mini">01</span></div>
         <strong>{{ maiorConsumoCpu().consumoCpu }}%</strong>
         <small>{{ maiorConsumoCpu().nome }}</small>
       </article>
       <article class="indicador">
         <div class="rotulo-indicador"><span>Alertas ativos</span><span class="bolha alerta">●</span></div>
         <strong>{{ recursosEmAlerta() }}</strong>
-        <small>necessitam de atenção</small>
+        <small>precisam de atenção</small>
       </article>
     </section>
 
-    <section class="painel-recursos">
+    <section class="painel-recursos" aria-labelledby="titulo-recursos">
       <div class="cabecalho-painel">
         <div>
           <p class="rotulo-secao">Infraestrutura</p>
-          <h2>Recursos monitorados</h2>
+          <h2 id="titulo-recursos">Recursos monitorados</h2>
         </div>
-        <select class="filtro" [value]="ambienteFiltro()" (change)="alterarAmbiente($event)" aria-label="Filtrar por ambiente">
-          <option>Todos</option>
-          <option>Produção</option>
-          <option>Homologação</option>
-          <option>Desenvolvimento</option>
-        </select>
+        <label class="selecao-filtro">
+          <span>Ambiente</span>
+          <select [value]="ambienteFiltro()" (change)="alterarAmbiente($event)" aria-label="Filtrar por ambiente">
+            <option>Todos</option>
+            <option>Produção</option>
+            <option>Homologação</option>
+            <option>Desenvolvimento</option>
+          </select>
+        </label>
       </div>
 
-      <div class="tabela">
-        <div class="linha tabela-cabecalho">
-          <span>Recurso</span><span>Ambiente</span><span>Consumo</span><span>Custo/mês</span><span>Estado</span><span></span>
+      <div class="tabela" role="table" aria-label="Recursos de infraestrutura">
+        <div class="linha tabela-cabecalho" role="row">
+          <span role="columnheader">Recurso</span><span role="columnheader">Ambiente</span><span role="columnheader">Consumo</span><span role="columnheader">Custo/mês</span><span role="columnheader">Estado</span><span role="columnheader">Ações</span>
         </div>
-        <div class="linha" *ngFor="let recurso of recursosFiltrados()">
-          <div class="celula-recurso">
-            <div class="icone-recurso">{{ recurso.tipo === 'Máquina virtual' ? 'VM' : recurso.tipo === 'Banco de dados' ? 'DB' : recurso.tipo === 'Rede' ? 'NW' : 'ST' }}</div>
-            <div><strong>{{ recurso.nome }}</strong><small>{{ recurso.provedor }} · {{ recurso.regiao }}</small></div>
+        @for (recurso of recursosFiltrados(); track recurso.id) {
+          <div class="linha" role="row">
+            <div class="celula-recurso" role="cell">
+              <div class="icone-recurso" aria-hidden="true">{{ recurso.tipo === 'Máquina virtual' ? 'VM' : recurso.tipo === 'Banco de dados' ? 'DB' : recurso.tipo === 'Rede' ? 'NW' : 'ST' }}</div>
+              <div><strong>{{ recurso.nome }}</strong><small>{{ recurso.provedor }} · {{ recurso.regiao }}</small></div>
+            </div>
+            <span class="ambiente" role="cell">{{ recurso.ambiente }}</span>
+            <div class="consumo" role="cell">
+              <div><span>CPU</span><strong>{{ recurso.consumoCpu }}%</strong></div>
+              <div class="barra" aria-label="Consumo de CPU: {{ recurso.consumoCpu }} por cento"><i [style.width.%]="recurso.consumoCpu"></i></div>
+            </div>
+            <strong class="custo" role="cell">{{ recurso.custoMensal | currency:'BRL':'symbol':'1.2-2' }}</strong>
+            <span class="estado" role="cell" [ngClass]="classeEstado(recurso.estado)"><i></i>{{ recurso.estado }}</span>
+            <div class="acoes" role="cell">
+              <button type="button" (click)="editarRecurso(recurso)" aria-label="Editar {{ recurso.nome }}">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 6l4 4M4 20l4.5-1 9.8-9.8a2.8 2.8 0 0 0-4-4L4.5 15 4 20Z"/></svg>
+              </button>
+              <button type="button" (click)="excluirRecurso(recurso.id)" aria-label="Excluir {{ recurso.nome }}">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13M10 11v5M14 11v5"/></svg>
+              </button>
+            </div>
           </div>
-          <span class="ambiente">{{ recurso.ambiente }}</span>
-          <div class="consumo">
-            <div><span>CPU</span><strong>{{ recurso.consumoCpu }}%</strong></div>
-            <div class="barra"><i [style.width.%]="recurso.consumoCpu"></i></div>
-          </div>
-          <strong class="custo">{{ recurso.custoMensal | currency:'BRL':'symbol':'1.2-2' }}</strong>
-          <span class="estado" [ngClass]="classeEstado(recurso.estado)"><i></i>{{ recurso.estado }}</span>
-          <div class="acoes">
-            <button type="button" (click)="editarRecurso(recurso)" aria-label="Editar {{ recurso.nome }}">✎</button>
-            <button type="button" (click)="excluirRecurso(recurso.id)" aria-label="Excluir {{ recurso.nome }}">×</button>
-          </div>
-        </div>
-        <div class="estado-vazio" *ngIf="!recursosFiltrados().length">
-          Nenhum recurso encontrado. Ajuste a busca ou os filtros.
-        </div>
+        }
+        @if (!recursosFiltrados().length) {
+          <div class="estado-vazio">Nenhum recurso encontrado. Ajuste a busca ou os filtros.</div>
+        }
       </div>
     </section>
   </main>
 </div>
 
-<div class="overlay" *ngIf="modalAberto()" (mousedown)="fecharModal()">
-  <section class="modal" role="dialog" aria-modal="true" aria-labelledby="titulo-modal" (mousedown)="$event.stopPropagation()">
-    <div class="cabecalho-modal">
-      <div><p class="rotulo-secao">Cadastro</p><h2 id="titulo-modal">{{ recursoEmEdicao() ? 'Editar recurso' : 'Novo recurso' }}</h2></div>
-      <button type="button" (click)="fecharModal()" aria-label="Fechar">×</button>
-    </div>
-    <form (ngSubmit)="salvarRecurso()">
-      <label>Nome do recurso<input [(ngModel)]="formularioRecurso.nome" name="nome" required placeholder="Ex: api-pagamentos"></label>
-      <div class="linha-formulario">
-        <label>Provedor<select [(ngModel)]="formularioRecurso.provedor" name="provedor"><option>AWS</option><option>Azure</option><option>Google Cloud</option></select></label>
-        <label>Tipo<select [(ngModel)]="formularioRecurso.tipo" name="tipo"><option>Máquina virtual</option><option>Banco de dados</option><option>Armazenamento</option><option>Rede</option></select></label>
+@if (modalAberto()) {
+  <div class="overlay" (mousedown)="fecharModal()">
+    <section class="modal" role="dialog" aria-modal="true" aria-labelledby="titulo-modal" (mousedown)="$event.stopPropagation()">
+      <div class="cabecalho-modal">
+        <div><p class="rotulo-secao">Cadastro</p><h2 id="titulo-modal">{{ recursoEmEdicao() ? 'Editar recurso' : 'Novo recurso' }}</h2></div>
+        <button type="button" (click)="fecharModal()" aria-label="Fechar modal">×</button>
       </div>
-      <div class="linha-formulario">
-        <label>Ambiente<select [(ngModel)]="formularioRecurso.ambiente" name="ambiente"><option>Produção</option><option>Homologação</option><option>Desenvolvimento</option></select></label>
-        <label>Estado<select [(ngModel)]="formularioRecurso.estado" name="estado"><option>Ativo</option><option>Alerta</option><option>Ocioso</option></select></label>
-      </div>
-      <div class="linha-formulario">
-        <label>Custo mensal (R$)<input type="number" min="0" step="0.01" [(ngModel)]="formularioRecurso.custoMensal" name="custo"></label>
-        <label>Região<input [(ngModel)]="formularioRecurso.regiao" name="regiao" placeholder="Ex: São Paulo"></label>
-      </div>
-      <div class="linha-formulario">
-        <label>Consumo de CPU (%)<input type="number" min="0" max="100" [(ngModel)]="formularioRecurso.consumoCpu" name="cpu"></label>
-        <label>Consumo de memória (%)<input type="number" min="0" max="100" [(ngModel)]="formularioRecurso.consumoMemoria" name="memoria"></label>
-      </div>
-      <div class="acoes-modal"><button type="button" class="botao-cancelar" (click)="fecharModal()">Cancelar</button><button type="submit" class="botao-novo">Salvar recurso</button></div>
-    </form>
-  </section>
-</div>
+      <form (ngSubmit)="salvarRecurso()">
+        <label>Nome do recurso<input [(ngModel)]="formularioRecurso.nome" name="nome" required placeholder="Ex: api-pagamentos"></label>
+        <div class="linha-formulario">
+          <label>Provedor<select [(ngModel)]="formularioRecurso.provedor" name="provedor"><option>AWS</option><option>Azure</option><option>Google Cloud</option></select></label>
+          <label>Tipo<select [(ngModel)]="formularioRecurso.tipo" name="tipo"><option>Máquina virtual</option><option>Banco de dados</option><option>Armazenamento</option><option>Rede</option></select></label>
+        </div>
+        <div class="linha-formulario">
+          <label>Ambiente<select [(ngModel)]="formularioRecurso.ambiente" name="ambiente"><option>Produção</option><option>Homologação</option><option>Desenvolvimento</option></select></label>
+          <label>Estado<select [(ngModel)]="formularioRecurso.estado" name="estado"><option>Ativo</option><option>Alerta</option><option>Ocioso</option></select></label>
+        </div>
+        <div class="linha-formulario">
+          <label>Custo mensal (R$)<input type="number" min="0" step="0.01" [(ngModel)]="formularioRecurso.custoMensal" name="custo"></label>
+          <label>Região<input [(ngModel)]="formularioRecurso.regiao" name="regiao" placeholder="Ex: São Paulo"></label>
+        </div>
+        <div class="linha-formulario">
+          <label>Consumo de CPU (%)<input type="number" min="0" max="100" [(ngModel)]="formularioRecurso.consumoCpu" name="cpu"></label>
+          <label>Consumo de memória (%)<input type="number" min="0" max="100" [(ngModel)]="formularioRecurso.consumoMemoria" name="memoria"></label>
+        </div>
+        <div class="acoes-modal"><button type="button" class="botao-cancelar" (click)="fecharModal()">Cancelar</button><button type="submit" class="botao-novo">Salvar recurso</button></div>
+      </form>
+    </section>
+  </div>
+}

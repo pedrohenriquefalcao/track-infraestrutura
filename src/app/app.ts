@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, HostListener, inject, signal } from '@angular/core';
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RecursoNuvem } from './recurso-nuvem.model';
@@ -47,6 +47,11 @@ export class App {
       this.recursos()[0] ?? this.servicoRecursos.criarModeloVazio()
     )
   );
+
+  @HostListener('document:keydown.escape')
+  fecharModalComEscape(): void {
+    if (this.modalAberto()) this.fecharModal();
+  }
 
   alterarBusca(evento: Event): void {
     this.termoBusca.set((evento.target as HTMLInputElement).value);
